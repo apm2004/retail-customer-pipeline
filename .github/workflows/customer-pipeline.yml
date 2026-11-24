@@ -4,16 +4,24 @@ on:
     branches:
       - main
 jobs:
-  customer-job:
+  deploy-dev:
     runs-on: ubuntu-latest
+    environment: DEV
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Run Customer Processing Script
-        run: python customer_processing.py
-      - name: Success Message
-        run: echo "Customer Processing Completed Successfully"
+      - uses: actions/checkout@v4
+      - run: echo "Deploying to DEV"
+
+  deploy-qa:
+    needs: deploy-dev
+    runs-on: ubuntu-latest
+    environment: QA
+    steps:
+      - run: echo "Deploying to QA"
+
+  deploy-prod:
+    needs: deploy-qa
+    runs-on: ubuntu-latest
+    environment: PROD
+    steps:
+      - run: echo "Deploying to PROD"
+  
