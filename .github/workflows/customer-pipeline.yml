@@ -1,27 +1,26 @@
-name: Customer Processing Pipeline
+name: Retail Data Pipeline Tests
+
 on:
   push:
-    branches:
-      - main
+    branches: [main]
+  pull_request:
+    branches: [main]
+
 jobs:
-  deploy-dev:
+  test:
     runs-on: ubuntu-latest
-    environment: DEV
-    steps:
-      - uses: actions/checkout@v4
-      - run: echo "Deploying to DEV"
 
-  deploy-qa:
-    needs: deploy-dev
-    runs-on: ubuntu-latest
-    environment: QA
     steps:
-      - run: echo "Deploying to QA"
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-  deploy-prod:
-    needs: deploy-qa
-    runs-on: ubuntu-latest
-    environment: PROD
-    steps:
-      - run: echo "Deploying to PROD"
-  
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install pytest
+
+      - name: Run PyTest
+        run: pytest -v
