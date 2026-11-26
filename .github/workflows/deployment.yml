@@ -38,6 +38,7 @@ jobs:
         run: pytest -v
 
 
+  
   databricks-connection:
     name: 2. Databricks Connection
     needs: testing
@@ -52,8 +53,13 @@ jobs:
           DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
           DATABRICKS_CLIENT_ID: ${{ secrets.DATABRICKS_CLIENT_ID }}
           DATABRICKS_CLIENT_SECRET: ${{ secrets.DATABRICKS_CLIENT_SECRET }}
+          DATABRICKS_AUTH_TYPE: oauth-m2m
 
-        run: databricks workspace list /
+        run: |
+          env -u DATABRICKS_ACCOUNT_ID \
+              -u DATABRICKS_TOKEN \
+              databricks workspace list /
+
 
 
   dev:
