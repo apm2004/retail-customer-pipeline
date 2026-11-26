@@ -16,7 +16,7 @@ permissions:
 jobs:
 
   testing:
-    name: Run Automated Tests
+    name: 1. Run Automated Tests
     runs-on: ubuntu-latest
 
     steps:
@@ -39,7 +39,7 @@ jobs:
 
 
   databricks-connection:
-    name: Connect to Databricks
+    name: 2. Databricks Connection
     needs: testing
     runs-on: ubuntu-latest
 
@@ -57,9 +57,8 @@ jobs:
 
 
   dev:
-    name: Deploy DEV
+    name: 3. Deploy DEV
     needs: databricks-connection
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: DEV
 
@@ -69,9 +68,8 @@ jobs:
 
 
   qa:
-    name: Deploy QA
+    name: 4. Deploy QA
     needs: dev
-    if: github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: QA
 
@@ -81,9 +79,8 @@ jobs:
 
 
   prod:
-    name: Deploy PROD
+    name: 5. Deploy PROD
     needs: qa
-    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     environment: PROD
 
