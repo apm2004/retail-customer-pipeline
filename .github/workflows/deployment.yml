@@ -38,48 +38,12 @@ jobs:
         run: pytest -v
 
 
-  dev:
-    name: Deploy DEV
-    needs: testing
-    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
-
-    runs-on: ubuntu-latest
-    environment: DEV
-
-    steps:
-      - name: Deploy to DEV
-        run: echo "Retail Data Pipeline deployed successfully to DEV"
-
-
-  qa:
-    name: Deploy QA
-    needs: dev
-    if: github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
-
-    runs-on: ubuntu-latest
-    environment: QA
-
-    steps:
-      - name: Deploy to QA
-        run: echo "Retail Data Pipeline deployed successfully to QA"
-
-
-  prod:
-    name: Deploy PROD
-    needs: qa
-    if: github.ref == 'refs/heads/main'
-
-    runs-on: ubuntu-latest
-    environment: PROD
   databricks-connection:
     name: Connect to Databricks
     needs: testing
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source Code
-        uses: actions/checkout@v4
-
       - name: Install Databricks CLI
         uses: databricks/setup-cli@main
 
@@ -91,6 +55,38 @@ jobs:
 
         run: databricks workspace list /
 
+
+  dev:
+    name: Deploy DEV
+    needs: databricks-connection
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: DEV
+
     steps:
-      - name: Production Deployment
-        run: echo "Retail Data Pipeline deployed successfully to PROD"
+      - name: Deploy to DEV
+        run: echo "Retail Data Pipeline deployed to DEV"
+
+
+  qa:
+    name: Deploy QA
+    needs: dev
+    if: github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: QA
+
+    steps:
+      - name: Deploy to QA
+        run: echo "Retail Data Pipeline deployed to QA"
+
+
+  prod:
+    name: Deploy PROD
+    needs: qa
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: PROD
+
+    steps:
+      - name: Deploy to PROD
+        run: echo "Retail Data Pipeline deployed to PROD"
