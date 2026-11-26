@@ -1,0 +1,77 @@
+
+name: Retail Data Pipeline CI-CD
+
+on:
+  push:
+    branches:
+      - develop
+      - qa
+      - main
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+
+  testing:
+    name: Run Automated Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Customer Processing
+        run: python customer_processing.py
+
+      - name: Run PyTest
+        run: pytest -v
+
+
+  dev:
+    name: Deploy DEV
+    needs: testing
+    if: github.ref == 'refs/heads/develop' || github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+    environment: DEV
+
+    steps:
+      - name: Deploy to DEV
+        run: echo "Retail Data Pipeline deployed successfully to DEV"
+
+
+  qa:
+    name: Deploy QA
+    needs: dev
+    if: github.ref == 'refs/heads/qa' || github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+    environment: QA
+
+    steps:
+      - name: Deploy to QA
+        run: echo "Retail Data Pipeline deployed successfully to QA"
+
+
+  prod:
+    name: Deploy PROD
+    needs: qa
+    if: github.ref == 'refs/heads/main'
+
+    runs-on: ubuntu-latest
+    environment: PROD
+
+    steps:
+      - name: Production Deployment
+        run: echo "Retail Data Pipeline deployed successfully to PROD"

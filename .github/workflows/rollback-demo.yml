@@ -1,0 +1,43 @@
+
+name: Rollback Demo
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  deployment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Current Production Deployment
+        run: echo "Blue Version 1.0 is currently in the Production Environment"
+
+      - name: Deploy Version 2.0
+        run: echo "Green Version 2.0 is deployed to the Production Environment"
+
+      - name: Production Health Check
+        id: health-check
+        continue-on-error: true
+        run: |
+          echo "Checking application health..."
+          echo "Health check failed. Rolling back to previous version."
+          exit 1
+
+      - name: Rollback to Previous Version 1.0
+        if: steps.health-check.outcome == 'failure'
+        run: |
+          echo "Deployment failed"
+          echo "Rolling back to previous version 1.0"
+          echo "Previous version 1.0 is deployed to the Production Environment"
+
+      - name: Deployment Completed
+        if: steps.health-check.outcome == 'success'
+        run: echo "Deployment completed successfully! Green Version 2.0 is now live"
+
+      - name: Rollback Completed
+        if: steps.health-check.outcome == 'failure'
+        run: echo "Rollback completed successfully! Blue Version 1.0 is now live"
